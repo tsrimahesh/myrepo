@@ -1,0 +1,108 @@
+Connect to DB system in a Private Subnet in Cloud: 
+
+There are two Options: 
+
+
+Database Tools Like SQLdeveloper/DBeaver 
+
+Please see 
+
+https://stackoverflow.com/questions/65481470/connect-to-remote-db-with-ssh-tunneling-in-dbeaver
+
+SSH client like linux terminal git bash(windows) or Windows Putty 
+
+Instructions for connecting to DB server using ssh client: 
+
+To create an SSH tunnel to a port on a compute node associated with Oracle Database , you use Secure Shell (SSH) client software that supports tunneling. 
+
+Creating an SSH Tunnel Using the ssh Utility on Linux 
+
+The Linux platform includes the ssh utility, an SSH client that supports SSH tunneling. 
+
+Before you use the ssh utility to create an SSH tunnel, you need the following: 
+
+The Public IP address of the Bastioncompute node. 
+
+The Private IP addresses associated with a database deployment on Cloud Service
+
+The SSH private key file. 
+
+The port number for which you want to create an SSH tunnel. 
+
+To create an SSH tunnel for a port using the ssh utility on Linux: 
+
+In a command shell, set the file permissions of the private key file so that only you have access to it: 
+
+Copy 
+
+$ chmod 600 private-key-file 
+ 
+Run the ssh utility: 
+
+$ ssh -i private-key-file -L local-port:db-private-ip-address:db-port remoteuser@bastion-public-ip-address
+
+e.g:
+
+$ ssh -i ~/.ssh/azure_key -L 1521:10.10.2.10:1521 opc@bastionhost.example.com
+
+where: 
+
+private-key-file is the path to the SSH private key file. 
+
+local-port is the number of an available port on your Linux system. Specify a port number greater than 1023 and less than 49152 to avoid conflicts with ports that are reserved for the system. As a good practice, and for the sake of simplicity, you should specify the same port number as the one to which you are creating a tunnel. 
+
+target-port is the port number to which you want to create a tunnel.
+
+db-private-ip-address is the IP address of the database server on the cloud. 
+
+remoteuser is the remote ssh user of bastion host
+ 
+If this is the first time you are connecting to the target compute node, the ssh utility prompts you to confirm the public key. In response to the prompt, enter yes. 
+
+After the SSH tunnel is created, you can access the port on the target compute node by specifying localhost:local-port on your Linux system. 
+
+To test access to the tunnel on the target port created in , run the following command:
+
+telnet 127.0.0.1 localport
+
+e.g telnet 127.0.0.1 1521
+
+ To create an SSH tunnel for a port using the PuTTY program on Windows:
+Download and install PuTTY.
+To download PuTTY, go to http://www.putty.org/ and click the You can download PuTTY here link.
+
+Run the PuTTY program.
+The PuTTY Configuration window is displayed, showing the Session panel.
+
+Configure SSH connectivity:
+In Host Name (or IP address) box, enter the IP address of the target compute node.
+Confirm that the Connection type option is set to SSH.
+In the Category tree, expand Connection if necessary and then click Data.
+The Data panel is displayed.
+
+In Auto-login username box, enter remoteuser e.g opc.
+Confirm that the When username is not specified option is set to Prompt.
+In the Category tree, expand SSH and then click Auth.
+The Auth panel is displayed.
+
+Click the Browse button next to the Private key file for authentication box. Then, in the Select private key file window, navigate to and open the private key file.
+Add a forwarded port:
+In the Category tree, click Tunnels.
+The Tunnels panel is displayed.
+
+In the Source Port box, enter the number of an available port on your system. Specify a port number greater than 1023 and less than 49152 to avoid conflicts with ports that are reserved for the system. As a good practice, and for the sake of simplicity, you should specify the same port number as the one to which you are creating a tunnel.
+In the Destination box, enter the IP address of the target DB Private IP address, a colon, and the port number to which you want to create a tunnel; for example, 10.10.2.164:1521.
+Confirm that the Local and Auto options are set.
+Click Add to add the forwarded port.
+The new forwarded port appears in the Forwarded ports list.
+
+In the Category tree, click Session.
+The Session panel is displayed.
+
+In the Saved Sessions box, enter a name for this connection configuration. Then, click Save.
+Click Open to open the connection.
+The PuTTY Configuration window is closed and the PuTTY window is displayed.
+
+If this is the first time you are connecting to the target compute node, the PuTTY Security Alert window is displayed, prompting you to confirm the public key. Click Yes to continue connecting.
+After the SSH tunnel is created, you can access the port on the target compute node by specifying localhost:local-port on your system, where local-port is the source port that you specified when creating the tunnel.
+
